@@ -89,7 +89,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     var totalHeight = element[0].clientHeight;
 
     if (totalHeight === 0 || totalWidth === 0) {
-      throw new Error('Please set height and width for the chart element');
+      // throw new Error('Please set height and width for the chart element');
+      totalHeight = 200;
+      totalWidth = 200;
     }
 
 
