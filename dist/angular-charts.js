@@ -97,7 +97,12 @@ angular.module('angularCharts').directive('acChart', [
       var totalWidth = element[0].clientWidth;
       var totalHeight = element[0].clientHeight;
       if (totalHeight === 0 || totalWidth === 0) {
-        throw new Error('Please set height and width for the chart element');
+
+        // throw new Error('Please set height and width for the chart element');
+
+        // Setting default W & H instead of throwing an error - subsequent calls will reset the dimensions
+        totalHeight = 200;
+        totalWidth = 200;
       }
       var data, series, points, height, width, chartContainer, legendContainer, chartType;
       /**
