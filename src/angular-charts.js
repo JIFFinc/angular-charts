@@ -583,7 +583,7 @@ angular.module('angularCharts').directive('acChart', [
      */
       function pieChart() {
         var radius = Math.min(width, height) / 2;
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + 50).attr('height', height + 20).append('g').attr('transform', 'scale(0.8)translate(' + (width / 2 + width * 0.2) + ',' + (height / 2 + height * 0.2) + ')');
+        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + 100).attr('height', height + 20).append('g').attr('transform', 'scale(0.8)translate(' + (width / 2 + width * 0.2) + ',' + (height / 2 + height * 0.2) + ')');
         var innerRadius = 0;
         if (config.innerRadius) {
           var configRadius = config.innerRadius;
@@ -631,6 +631,8 @@ angular.module('angularCharts').directive('acChart', [
         });
         if (!!config.labels) {
 
+          var outerLabelFontSize = radius > 240 ? '1.7rem' : '2rem';
+          var innerLabelFontSize = radius > 240 ? '2rem' : '2.5rem';
           var totalSegmentValues = d3.sum(data.data, function(d){ return d.y[0]; });
 
           path.append('text').attr('transform', function (d) {
@@ -639,7 +641,7 @@ angular.module('angularCharts').directive('acChart', [
             return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
           })
           .attr('dy', '.35em')
-          .style('text-anchor', 'middle').style('font-size', '2rem')
+          .style('text-anchor', 'middle').style('font-size', outerLabelFontSize)
           .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
           .text(function (d) {
             return d.data.x;
@@ -650,7 +652,7 @@ angular.module('angularCharts').directive('acChart', [
                   m = 1.5;
               return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
             }).attr('dy', '.35em')
-            .style('text-anchor', 'middle').style('font-size', '2.5rem')
+            .style('text-anchor', 'middle').style('font-size', innerLabelFontSize)
             .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
             .text(function (d) {
               return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
