@@ -97,9 +97,7 @@ angular.module('angularCharts').directive('acChart', [
       var totalWidth = element[0].clientWidth;
       var totalHeight = element[0].clientHeight;
       if (totalHeight === 0 || totalWidth === 0) {
-
         // throw new Error('Please set height and width for the chart element');
-
         // Setting default W & H instead of throwing an error - subsequent calls will reset the dimensions
         totalHeight = 200;
         totalWidth = 200;
@@ -585,7 +583,7 @@ angular.module('angularCharts').directive('acChart', [
      */
       function pieChart() {
         var radius = Math.min(width, height) / 2;
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width+50).attr('height', height+20).append('g').attr('transform', 'scale(0.8)translate(' + ((width / 2) + width * 0.2) + ',' + ((height / 2) + height * 0.2) + ')');
+        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + 50).attr('height', height + 20).append('g').attr('transform', 'scale(0.8)translate(' + (width / 2 + width * 0.2) + ',' + (height / 2 + height * 0.2) + ')');
         var innerRadius = 0;
         if (config.innerRadius) {
           var configRadius = config.innerRadius;
@@ -632,21 +630,32 @@ angular.module('angularCharts').directive('acChart', [
           }
         });
         if (!!config.labels) {
-          path.append('text')
-          // .attr('transform', function (d) {
-          //   return 'translate(' + arc.centroid(d) + ')';
-          // })
-          .attr("transform", function(d) {
+
+          var totalSegmentValues = d3.sum(data.data, function(d){ return d.y[0]; });
+
+          path.append('text').attr('transform', function (d) {
             var c = arc.centroid(d),
-                m = 2.4;
-            return "translate(" + c[0] * m +"," + c[1] * m + ")";
+                m = 2.5;
+            return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
           })
           .attr('dy', '.35em')
-          .style('text-anchor', 'middle')
-          .style('font-size', '2rem')
+          .style('text-anchor', 'middle').style('font-size', '2rem')
+          .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
           .text(function (d) {
             return d.data.x;
           });
+          if (!!config.percentageInnerLabels) {
+            path.append('text').attr('transform', function (d) {
+              var c = arc.centroid(d),
+                  m = 1.5;
+              return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
+            }).attr('dy', '.35em')
+            .style('text-anchor', 'middle').style('font-size', '2.5rem')
+            .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
+            .text(function (d) {
+              return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
+            });
+          }
         }
         function tweenPie(b) {
           b.innerRadius = 0;
