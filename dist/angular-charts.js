@@ -630,12 +630,23 @@ angular.module('angularCharts').directive('acChart', [
           }
         });
         if (!!config.labels) {
+          var totalSegmentValues = d3.sum(data.data, function (d) {
+              return d.y[0];
+            });
           path.append('text').attr('transform', function (d) {
-            var c = arc.centroid(d), m = 2.4;
+            var c = arc.centroid(d), m = 2.5;
             return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
-          }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', '2rem').text(function (d) {
+          }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', '2rem').style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
             return d.data.x;
           });
+          if (!!config.percentageInnerLabels) {
+            path.append('text').attr('transform', function (d) {
+              var c = arc.centroid(d), m = 1.5;
+              return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
+            }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', '2.5rem').style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
+              return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
+            });
+          }
         }
         function tweenPie(b) {
           b.innerRadius = 0;
