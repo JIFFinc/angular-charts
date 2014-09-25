@@ -224,7 +224,7 @@ angular.module('angularCharts').directive('acChart', [
         var x = d3.scale.ordinal().rangeRoundBands([
             0,
             width
-          ], 0.1);
+          ], 0.2);
         var y = d3.scale.linear().range([
             height,
             10
@@ -272,8 +272,16 @@ angular.module('angularCharts').directive('acChart', [
        * Start drawing the chart!
        * @type {[type]}
        */
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom + 50).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        if (points.length < 6) {
+          // Don't rotate x-axis labels
+          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('dy', '1.2em');
+        } else {
+          // Rotate x-axis labels
+          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').style('text-anchor', 'end').attr('dx', '-.8em').attr('dy', '1em').attr('transform', function (d) {
+            return 'rotate(-25)';
+          });
+        }
         svg.append('g').attr('class', 'y axis').call(yAxis);
         /**
       * Add bars
