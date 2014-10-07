@@ -81,8 +81,9 @@ angular.module('angularCharts').directive('acChart', [
         mouseout: function() {},
         click: function() {},
         legend: {
-          display: true, // can be either 'left' or 'right'.
-          position: 'left',
+          display: true,
+          position: 'left', // can be either 'left' or 'right'.
+          reverse: false,
           htmlEnabled: false
         },
         colors: defaultColors,
@@ -170,15 +171,8 @@ angular.module('angularCharts').directive('acChart', [
         chartType = scope.acChart;
         series = data ? data.series || [] : [];
         points = data ? data.data || [] : [];
-
-        if (scope.acConfig) {
-          var arr = [];
-          if (scope.acConfig.colors) {
-            ;[].push.apply(arr, scope.acConfig.colors);
-          }
-          ;[].push.apply(arr, defaultColors);
+        if(!!scope.acConfig) {
           angular.extend(config, scope.acConfig);
-          config.colors = arr;
         }
       }
 
@@ -968,7 +962,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if (chartType === 'bar' || chartType === 'area' || chartType === 'point' ||
+        if (chartType === 'bar' || chartType === 'stacked-bar' || chartType === 'area' || chartType === 'point' ||
           (chartType === 'line' && config.lineLegend === 'traditional')) {
           angular.forEach(series, function(value, key) {
             scope.legends.push({
@@ -976,6 +970,9 @@ angular.module('angularCharts').directive('acChart', [
               title: getBindableTextForLegend(value)
             });
           });
+        }
+        if(config.legend.reverse) {
+          scope.legends.reverse();
         }
       }
 
