@@ -165,19 +165,18 @@ angular.module('angularCharts').directive('acChart', [
 
       // Parses data from attributes
       function prepareData() {
+
         data = scope.acData;
         chartType = scope.acChart;
-        console.log('>>>> chartType',chartType);
         series = data ? data.series || [] : [];
         points = data ? data.data || [] : [];
+
         if (scope.acConfig) {
           var arr = [];
           if (scope.acConfig.colors) {
-            ;
-            [].push.apply(arr, scope.acConfig.colors);
+            ;[].push.apply(arr, scope.acConfig.colors);
           }
-          ;
-          [].push.apply(arr, defaultColors);
+          ;[].push.apply(arr, defaultColors);
           angular.extend(config, scope.acConfig);
           config.colors = arr;
         }
@@ -452,28 +451,33 @@ angular.module('angularCharts').directive('acChart', [
           .transition()
           .ease('cubic-in-out')
           .duration(config.isAnimate ? 1000 : 0)
-          .attr("y", function(d) { return y(d.y1); })
-          .attr("height", function(d) { return y(d.y0) - y(d.y1); });
+          .attr('y', function(d) { return y(d.y1); })
+          .attr('height', function(d) { return y(d.y0) - y(d.y1); });
 
         // Add events for tooltip
-        bars.on('mouseover', function (d) {
+        bars.on('mouseover', function(d) {
           makeToolTip({
             index: d.x,
             value: d.tooltip ? d.tooltip : d.y,
             series: series[d.s]
           }, d3.event);
+
           config.mouseover(d, d3.event);
           scope.$apply();
-        }).on('mouseleave', function (d) {
-          removeToolTip();
-          config.mouseout(d, d3.event);
-          scope.$apply();
-        }).on('mousemove', function (d) {
-          updateToolTip(d3.event);
-        }).on('click', function (d) {
-          config.click.call(d, d3.event);
-          scope.$apply();
-        });
+        })
+          .on('mouseleave', function(d) {
+            removeToolTip();
+            config.mouseout(d, d3.event);
+            scope.$apply();
+          })
+          .on('mousemove', function(d) {
+            updateToolTip(d, d3.event);
+          })
+          .on('click', function(d) {
+            config.click.call(d, d3.event);
+            scope.$apply();
+          });
+
 
         // Add bar labels [optional]
         if (config.labels) {
@@ -869,10 +873,6 @@ angular.module('angularCharts').directive('acChart', [
         svg.selectAll('.points').data(linedata).enter().append('g');
 
         // Add points
-        // @param  {[type]} value [description]
-        // @param  {[type]} key   [description]
-        // @return {[type]}       [description]
-
         angular.forEach(linedata, function (value, key) {
           var points = svg.selectAll('.circle').data(value.values).enter();
           points.append('circle').attr('cx', function (d) {
@@ -911,66 +911,66 @@ angular.module('angularCharts').directive('acChart', [
         });
 
         // Returns x point of line point
-        // @param  {[type]} d [description]
-        // @return {[type]}   [description]
-
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
       }
 
       // Creates and displays tooltip
-      // @return {[type]} [description]
-
       function makeToolTip(data, event) {
+
         if (!config.tooltips) {
           return;
         }
-        if (typeof config.tooltips == 'function') {
+        if (typeof config.tooltips === 'function') {
           data = config.tooltips(data);
         } else {
           data = data.value;
         }
-        var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).css({
-            left: event.pageX + 20 + 'px',
-            top: event.pageY - 30 + 'px'
+
+        var el = angular.element('<p class="ac-tooltip"></p>')
+          .html(data)
+          .css({
+            left: (event.pageX + 20) + 'px',
+            top: (event.pageY - 30) + 'px'
           });
+
+        angular.element(document.querySelector('.ac-tooltip')).remove();
         angular.element(document.body).append(el);
+
         scope.$tooltip = el;
       }
 
       // Clears the tooltip from body
-      // @return {[type]} [description]
-
       function removeToolTip() {
         if (scope.$tooltip) {
           scope.$tooltip.remove();
         }
       }
-      function updateToolTip(event) {
+
+      function updateToolTip(d, event) {
         if (scope.$tooltip) {
           scope.$tooltip.css({
-            left: event.pageX + 20 + 'px',
-            top: event.pageY - 30 + 'px'
+            left: (event.pageX + 20) + 'px',
+            top: (event.pageY - 30) + 'px'
           });
         }
       }
 
       // Adds data to legend
-      // @return {[type]} [description]
-
       function drawLegend() {
         scope.legends = [];
-        if (chartType == 'pie') {
-          angular.forEach(points, function (value, key) {
+        if (chartType === 'pie') {
+          angular.forEach(points, function(value, key) {
             scope.legends.push({
               color: config.colors[key],
               title: getBindableTextForLegend(value.x)
             });
           });
         }
-        if (chartType == 'bar' || chartType == 'area' || chartType == 'point' || chartType == 'line' && config.lineLegend === 'traditional') {
-          angular.forEach(series, function (value, key) {
+        if (chartType === 'bar' || chartType === 'area' || chartType === 'point' ||
+          (chartType === 'line' && config.lineLegend === 'traditional')) {
+          angular.forEach(series, function(value, key) {
             scope.legends.push({
               color: config.colors[key],
               title: getBindableTextForLegend(value)
@@ -978,6 +978,7 @@ angular.module('angularCharts').directive('acChart', [
           });
         }
       }
+
       var HTML_ENTITY_MAP = {
           '&': '&amp;',
           '<': '&lt;',
@@ -986,11 +987,13 @@ angular.module('angularCharts').directive('acChart', [
           '\'': '&#39;',
           '/': '&#x2F;'
         };
+
       function escapeHtml(string) {
         return String(string).replace(/[&<>"'\/]/g, function (char) {
           return HTML_ENTITY_MAP[char];
         });
       }
+
       function getBindableTextForLegend(text) {
         return $sce.trustAsHtml(config.legend.htmlEnabled ? text : escapeHtml(text));
       }
@@ -1009,6 +1012,7 @@ angular.module('angularCharts').directive('acChart', [
           return color;
         }
       }
+
       var w = angular.element($window);
       var resizePromise = null;
       w.bind('resize', function (ev) {
@@ -1019,12 +1023,14 @@ angular.module('angularCharts').directive('acChart', [
           init();
         }, 100);
       });
+
       scope.getWindowDimensions = function () {
         return {
           'h': w[0].clientHeight,
           'w': w[0].clientWidth
         };
       };
+
       // Watch for any of the config changing.
       scope.$watch('[acChart, acData, acConfig]', init, true);
       scope.$watch(function () {
@@ -1038,6 +1044,7 @@ angular.module('angularCharts').directive('acChart', [
         init();
       }, true);
     }
+
     return {
       restrict: 'EA',
       link: link,
