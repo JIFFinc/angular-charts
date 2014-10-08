@@ -115,8 +115,8 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('notest', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean']);
-  grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean', 'karma']);
+  grunt.registerTask('test', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean', 'karma']);
+  grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean']);
   grunt.registerTask('release', ['prompt', 'bowerValidateRelease']);
 
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
