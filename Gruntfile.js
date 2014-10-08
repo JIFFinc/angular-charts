@@ -117,7 +117,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('notest', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean']);
   grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean', 'karma']);
-  grunt.registerTask('release', ['karma', 'prompt', 'bowerValidateRelease']);
+  grunt.registerTask('release', ['prompt', 'bowerValidateRelease']);
 
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
     if(grunt.config('release') === true) {
