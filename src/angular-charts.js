@@ -341,7 +341,7 @@ angular.module('angularCharts').directive('acChart', [
           top: 0,
           right: 20,
           bottom: 30,
-          left: 40
+          left: 60
         };
 
         width  -= margin.left + margin.right;
@@ -383,10 +383,19 @@ angular.module('angularCharts').directive('acChart', [
         }));
 
         var padding = d3.max(yData) * 0.2;
-        y.domain([
-          d3.min(yData),
-          d3.max(yData) + padding
-        ]);
+
+        if(config.yAxis && config.yAxis.scale === 'percentage') {
+
+          y.domain([ 0, 100 ]);
+
+        } else {
+
+          y.domain([
+            d3.min(yData),
+            d3.max(yData) + padding
+          ]);
+
+        }
 
         x0.domain(d3.range(yMaxPoints))
           .rangeRoundBands([ 0, x.rangeBand() ]);
@@ -397,11 +406,28 @@ angular.module('angularCharts').directive('acChart', [
 
         filterXAxis(xAxis, x);
 
+
+        // Prefix tick labels
+        var yTickPrefix,
+            yTickPostfix;
+
+        if(config.yAxis && config.yAxis.tickPrefix) {
+          yTickPrefix = config.yAxis.tickPrefix;
+        }
+        if(config.yAxis && config.yAxis.tickPostfix) {
+          yTickPostfix = config.yAxis.tickPostfix;
+        }
+
         var yAxis = d3.svg.axis()
                       .scale(y)
                       .orient('left')
                       .ticks(10)
-                      .tickFormat(d3.format('s'));
+                      .tickFormat(d3.format( '' + yTickPrefix + 's' + yTickPostfix));
+
+        // Special tick postfix for percentage scale
+        if(config.yAxis && config.yAxis.scale === 'percentage') {
+          yAxis.tickFormat(function(d) { return d + '%'; });
+        }
 
         // Start drawing the chart
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom + 50).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -416,6 +442,20 @@ angular.module('angularCharts').directive('acChart', [
         }
 
         svg.append('g').attr('class', 'y axis').call(yAxis);
+
+        // Y axis vertical label
+        if(config.yAxis && config.yAxis.label) {
+
+          svg.append('text')
+             .attr('transform', 'rotate(-90)')
+             .attr('y', 0 - margin.left)
+             .attr('x', 0 - (height / 2))
+             .attr('dy', '1em')
+             .style('text-anchor', 'middle')
+             .attr('class', 'y-axis-label')
+             .text(config.yAxis.label);
+
+        }
 
         // Add bars
         var barGroups = svg.selectAll('.state')
@@ -971,7 +1011,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if(config.legend.reverse) {
+        if(config.legend && config.legend.reverse) {
           scope.legends.reverse();
         }
       }
