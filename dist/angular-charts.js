@@ -422,7 +422,7 @@ angular.module('angularCharts').directive('acChart', [
           config.mouseout(d, d3.event);
           scope.$apply();
         }).on('mousemove', function (d) {
-          updateToolTip(d, d3.event);
+          updateToolTip(d3.event);
         }).on('click', function (d) {
           config.click.call(d, d3.event);
           scope.$apply();
@@ -843,7 +843,7 @@ angular.module('angularCharts').directive('acChart', [
       }
       // Creates and displays tooltip
       function makeToolTip(data, event) {
-        if (!config.tooltips) {
+        if (!config.tooltips || !event) {
           return;
         }
         if (typeof config.tooltips === 'function') {
@@ -865,7 +865,10 @@ angular.module('angularCharts').directive('acChart', [
           scope.$tooltip.remove();
         }
       }
-      function updateToolTip(d, event) {
+      function updateToolTip(event) {
+        if (!event) {
+          return;
+        }
         if (scope.$tooltip) {
           scope.$tooltip.css({
             left: event.pageX + 20 + 'px',
