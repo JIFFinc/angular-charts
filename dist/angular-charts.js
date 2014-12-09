@@ -442,6 +442,87 @@ angular.module('angularCharts').directive('acChart', [
         // Draw one zero line in case negative values exist
         svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
       }
+      /////////////////////////////////////////////////////////////////
+      // PIE CHART                                                   //
+      /////////////////////////////////////////////////////////////////
+      function pieChart() {
+        var innerRadius = 0, radius = Math.min(width, height) / 2, svg = d3.select(chartContainer[0]).append('svg').attr('width', width + 100).attr('height', height + 30).append('g').attr('transform', 'scale(0.8)translate(' + (width / 2 + width * 0.2) + ',' + (height / 2 + height * 0.2) + ')');
+        if (config.innerRadius) {
+          var configRadius = config.innerRadius;
+          if (typeof configRadius === 'string' && configRadius.indexOf('%') > 0) {
+            configRadius = radius * (parseFloat(configRadius) * 0.01);
+          } else {
+            configRadius = Number(configRadius);
+          }
+          if (configRadius >= 0) {
+            innerRadius = configRadius;
+          }
+        }
+        scope.yMaxData = points.length;
+        var arc = d3.svg.arc().outerRadius(radius - 10).innerRadius(innerRadius);
+        var pie = d3.layout.pie().sort(null).value(function (d) {
+            return d.y[0];
+          });
+        var path = svg.selectAll('.arc').data(pie(points)).enter().append('g');
+        var complete = false;
+        path.append('path').style('fill', function (d, i) {
+          return getColor(i);
+        }).transition().ease('linear').duration(config.isAnimate ? 500 : 0).attrTween('d', tweenPie).attr('class', 'arc').each('end', function () {
+          //avoid firing multiple times
+          if (!complete) {
+            complete = true;
+            //Add listeners when transition is done
+            path.on('mouseover', function (d) {
+              makeToolTip({ value: d.data.tooltip ? d.data.tooltip : d.data.y[0] }, d3.event);
+              d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
+              config.mouseover(d, d3.event);
+              scope.$apply();
+            }).on('mouseleave', function (d) {
+              d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
+              removeToolTip();
+              config.mouseout(d, d3.event);
+              scope.$apply();
+            }).on('mousemove', function (d) {
+              updateToolTip(d3.event);
+            }).on('click', function (d) {
+              config.click(d, d3.event);
+              scope.$apply();
+            });
+          }
+        });
+        if (config.labels) {
+          var outerLabelFontSize = radius > 240 ? '1.7em' : '2em';
+          var innerLabelFontSize = radius > 240 ? '2em' : '2.5em';
+          var totalSegmentValues = d3.sum(data.data, function (d) {
+              return d.y[0];
+            });
+          path.append('text').attr('transform', function (d) {
+            var c = arc.centroid(d), m = 2.75;
+            // label distance from center
+            return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
+          }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', outerLabelFontSize).style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
+            return d.data.x;
+          });
+          if (!!config.percentageInnerLabels) {
+            path.append('text').attr('transform', function (d) {
+              var c = arc.centroid(d), m = 1.5;
+              return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
+            }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', innerLabelFontSize).style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
+              return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
+            });
+          }
+        }
+        function tweenPie(b) {
+          b.innerRadius = 0;
+          var i = d3.interpolate({
+              startAngle: 0,
+              endAngle: 0
+            }, b);
+          return function (t) {
+            return arc(i(t));
+          };
+        }
+      }
       // Draws a line chart
       function lineChart() {
         var margin = {
@@ -657,89 +738,6 @@ angular.module('angularCharts').directive('acChart', [
         }).style('opacity', '0.7');
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
-        }
-      }
-      // Draws a beautiful pie chart
-      // @return {[type]} [description]
-      function pieChart() {
-        var radius = Math.min(width, height) / 2;
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + 100).attr('height', height + 20).append('g').attr('transform', 'scale(0.8)translate(' + (width / 2 + width * 0.2) + ',' + (height / 2 + height * 0.2) + ')');
-        var innerRadius = 0;
-        if (config.innerRadius) {
-          var configRadius = config.innerRadius;
-          if (typeof configRadius === 'string' && configRadius.indexOf('%') > 0) {
-            configRadius = radius * (parseFloat(configRadius) * 0.01);
-          } else {
-            configRadius = Number(configRadius);
-          }
-          if (configRadius >= 0) {
-            innerRadius = configRadius;
-          }
-        }
-        scope.yMaxData = points.length;
-        var arc = d3.svg.arc().outerRadius(radius - 10).innerRadius(innerRadius);
-        d3.svg.arc().outerRadius(radius + 5).innerRadius(0);
-        var pie = d3.layout.pie().sort(null).value(function (d) {
-            return d.y[0];
-          });
-        var path = svg.selectAll('.arc').data(pie(points)).enter().append('g');
-        var complete = false;
-        path.append('path').style('fill', function (d, i) {
-          return getColor(i);
-        }).transition().ease('linear').duration(config.isAnimate ? 500 : 0).attrTween('d', tweenPie).attr('class', 'arc').each('end', function () {
-          //avoid firing multiple times
-          if (!complete) {
-            complete = true;
-            //Add listeners when transition is done
-            path.on('mouseover', function (d) {
-              makeToolTip({ value: d.data.tooltip ? d.data.tooltip : d.data.y[0] }, d3.event);
-              d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-              config.mouseover(d, d3.event);
-              scope.$apply();
-            }).on('mouseleave', function (d) {
-              d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
-              removeToolTip();
-              config.mouseout(d, d3.event);
-              scope.$apply();
-            }).on('mousemove', function (d) {
-              updateToolTip(d3.event);
-            }).on('click', function (d) {
-              config.click(d, d3.event);
-              scope.$apply();
-            });
-          }
-        });
-        if (!!config.labels) {
-          var outerLabelFontSize = radius > 240 ? '1.7em' : '2em';
-          var innerLabelFontSize = radius > 240 ? '2em' : '2.5em';
-          var totalSegmentValues = d3.sum(data.data, function (d) {
-              return d.y[0];
-            });
-          path.append('text').attr('transform', function (d) {
-            var c = arc.centroid(d), m = 2.75;
-            // label distance from center
-            return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
-          }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', outerLabelFontSize).style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
-            return d.data.x;
-          });
-          if (!!config.percentageInnerLabels) {
-            path.append('text').attr('transform', function (d) {
-              var c = arc.centroid(d), m = 1.5;
-              return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
-            }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', innerLabelFontSize).style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
-              return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
-            });
-          }
-        }
-        function tweenPie(b) {
-          b.innerRadius = 0;
-          var i = d3.interpolate({
-              startAngle: 0,
-              endAngle: 0
-            }, b);
-          return function (t) {
-            return arc(i(t));
-          };
         }
       }
       function pointChart() {
@@ -968,7 +966,6 @@ angular.module('angularCharts').directive('acChart', [
         acConfig: '='
       }
     };
-    $window.alert('hi');
   }
 ]);
 (function () {
