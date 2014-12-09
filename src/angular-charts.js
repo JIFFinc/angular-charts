@@ -259,36 +259,71 @@ angular.module('angularCharts').directive('acChart', [
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(10).tickFormat(d3.format('s'));
 
         // Start drawing the chart
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom + 50).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        var svg = d3.select(chartContainer[0])
+                    .append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom + 50)
+                    .append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
         // Add x-axis labels
         if(points.length > 5) {  // TODO: make the threshold a config var
           // Rotate labels if there are many of them
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", "1em").attr("transform", function(d) {return "rotate(-25)"});
+          svg.append('g')
+             .attr('class', 'x axis')
+             .attr('transform', 'translate(0,' + height + ')')
+             .call(xAxis)
+             .selectAll("text")
+             .style("text-anchor", "end")
+             .attr("dx", "-.8em")
+             .attr("dy", "1em")
+             .attr("transform", function(d) {return "rotate(-25)"});
         } else {
           // Don't rotate labels
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll("text").attr("dy", "1.2em");
+          svg.append('g')
+             .attr('class', 'x axis')
+             .attr('transform', 'translate(0,' + height + ')')
+             .call(xAxis)
+             .selectAll("text")
+             .attr("dy", "1.2em");
         }
 
-        svg.append('g').attr('class', 'y axis').call(yAxis);
+        svg.append('g')
+           .attr('class', 'y axis')
+           .call(yAxis);
 
         // Add bars
-        var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
-            return 'translate(' + x(d.x) + ',0)';
-          });
-        var bars = barGroups.selectAll('rect').data(function (d) {
-            return d.nicedata;
-          }).enter().append('rect');
+        var barGroups = svg.selectAll('.state')
+                           .data(points)
+                           .enter()
+                           .append('g')
+                           .attr('class', 'g')
+                           .attr('transform', function (d) {
+                             return 'translate(' + x(d.x) + ',0)';
+                           });
+        var bars = barGroups.selectAll('rect')
+                            .data(function (d) {
+                              return d.nicedata;
+                            }).enter()
+                            .append('rect');
         bars.attr('width', x0.rangeBand());
         bars.attr('x', function (d, i) {
-          return x0(i);
-        }).attr('y', height).style('fill', function (d) {
-          return getColor(d.s);
-        }).attr('height', 0).transition().ease('cubic-in-out').duration(config.isAnimate ? 1000 : 0).attr('y', function (d) {
-          return y(Math.max(0, d.y));
-        }).attr('height', function (d) {
-          return Math.abs(y(d.y) - y(0));
-        });
+              return x0(i);
+            })
+            .attr('y', height)
+            .style('fill', function (d) {
+              return getColor(d.s);
+            })
+            .attr('height', 0)
+            .transition()
+            .ease('cubic-in-out')
+            .duration(config.isAnimate ? 1000 : 0)
+            .attr('y', function (d) {
+              return y(Math.max(0, d.y));
+            })
+            .attr('height', function (d) {
+              return Math.abs(y(d.y) - y(0));
+            });
 
         // Add events for tooltip
         bars.on('mouseover', function (d) {
@@ -312,19 +347,30 @@ angular.module('angularCharts').directive('acChart', [
 
         // Add bar labels [optional]
         if (config.labels) {
-          barGroups.selectAll('not-a-class').data(function (d) {
-            return d.nicedata;
-          }).enter().append('text').attr('class', 'ac-bar-label').attr('x', function (d, i) {
-            return x0(i);
-          }).attr('y', function (d) {
-            return height - Math.abs(y(d.y) - y(0));
-          }).text(function (d) {
-            return d.y;
-          });
+          barGroups.selectAll('not-a-class')
+                   .data(function (d) {
+                     return d.nicedata;
+                   })
+                   .enter()
+                   .append('text')
+                   .attr('class', 'ac-bar-label')
+                   .attr('x', function (d, i) {
+                     return x0(i);
+                   })
+                   .attr('y', function (d) {
+                     return height - Math.abs(y(d.y) - y(0));
+                   })
+                   .text(function (d) {
+                     return d.y;
+                   });
         }
 
         // Draw one zero line in case negative values exist
-        svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
+        svg.append('line')
+           .attr('x1', width)
+           .attr('y1', y(0))
+           .attr('y2', y(0))
+           .style('stroke', 'silver');
 
       }
 
@@ -430,18 +476,38 @@ angular.module('angularCharts').directive('acChart', [
         }
 
         // Start drawing the chart
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom + 50).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        var svg = d3.select(chartContainer[0])
+                    .append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom + 50)
+                    .append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
         // Add x-axis labels
         if(points.length > 5) {  // TODO: make the threshold a config var
           // Rotate labels if there are many of them
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", "1em").attr("transform", function(d) {return "rotate(-25)"});
+          svg.append('g')
+             .attr('class', 'x axis')
+             .attr('transform', 'translate(0,' + height + ')')
+             .call(xAxis)
+             .selectAll("text")
+             .style("text-anchor", "end")
+             .attr("dx", "-.8em")
+             .attr("dy", "1em")
+             .attr("transform", function(d) {return "rotate(-25)"});
         } else {
           // Don't rotate labels
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll("text").attr("dy", "1.2em");
+          svg.append('g')
+             .attr('class', 'x axis')
+             .attr('transform', 'translate(0,' + height + ')')
+             .call(xAxis)
+             .selectAll("text")
+             .attr("dy", "1.2em");
         }
 
-        svg.append('g').attr('class', 'y axis').call(yAxis);
+        svg.append('g')
+           .attr('class', 'y axis')
+           .call(yAxis);
 
         // Y axis vertical label
         if(config.yAxis && config.yAxis.label) {
@@ -515,20 +581,164 @@ angular.module('angularCharts').directive('acChart', [
 
         // Add bar labels [optional]
         if (config.labels) {
-          barGroups.selectAll('not-a-class').data(function (d) {
-            return d.nicedata;
-          }).enter().append('text').attr('x', function (d, i) {
-            return x0(i);
-          }).attr('y', function (d) {
-            return height - Math.abs(y(d.y) - y(0));
-          }).text(function (d) {
-            return d.y;
-          });
+          barGroups.selectAll('not-a-class')
+                   .data(function (d) {
+                     return d.nicedata;
+                   })
+                   .enter()
+                   .append('text')
+                   .attr('x', function (d, i) {
+                     return x0(i);
+                   })
+                   .attr('y', function (d) {
+                     return height - Math.abs(y(d.y) - y(0));
+                   })
+                   .text(function (d) {
+                     return d.y;
+                   });
         }
 
         // Draw one zero line in case negative values exist
-        svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
+        svg.append('line')
+           .attr('x1', width)
+           .attr('y1', y(0))
+           .attr('y2', y(0))
+           .style('stroke', 'silver');
 
+      }
+
+
+      /////////////////////////////////////////////////////////////////
+      // PIE CHART                                                   //
+      /////////////////////////////////////////////////////////////////
+
+      function pieChart() {
+
+        var innerRadius = 0,
+            radius = Math.min(width, height) / 2,
+            svg = d3.select(chartContainer[0])
+                    .append('svg')
+                    .attr('width', width + 100)
+                    .attr('height', height + 30)
+                    .append('g')
+                    .attr('transform', 'scale(0.8)translate(' +
+                      (width  / 2 + width  * 0.2) + ',' +
+                      (height / 2 + height * 0.2) +
+                    ')');
+
+        if (config.innerRadius) {
+          var configRadius = config.innerRadius;
+          if (typeof configRadius === 'string' && configRadius.indexOf('%') > 0) {
+            configRadius = radius * (parseFloat(configRadius) * 0.01);
+          } else {
+            configRadius = Number(configRadius);
+          }
+          if (configRadius >= 0) {
+            innerRadius = configRadius;
+          }
+        }
+        scope.yMaxData = points.length;
+
+        var arc = d3.svg.arc()
+                    .outerRadius(radius - 10)
+                    .innerRadius(innerRadius);
+
+        var pie = d3.layout.pie()
+                    .sort(null)
+                    .value(function (d) {
+                      return d.y[0];
+                    });
+
+        var path = svg.selectAll('.arc')
+                      .data(pie(points))
+                      .enter()
+                      .append('g');
+
+        var complete = false;
+
+        path.append('path')
+            .style('fill', function (d, i) {
+              return getColor(i);
+            })
+            .transition()
+            .ease('linear')
+            .duration(config.isAnimate ? 500 : 0)
+            .attrTween('d', tweenPie)
+            .attr('class', 'arc')
+            .each('end', function () {
+              //avoid firing multiple times
+              if (!complete) {
+                complete = true;
+                //Add listeners when transition is done
+                path.on('mouseover', function (d) {
+                  makeToolTip({ value: d.data.tooltip ? d.data.tooltip : d.data.y[0] }, d3.event);
+                  d3.select(this)
+                    .select('path')
+                    .transition()
+                    .duration(200)
+                    .style('stroke', 'white')
+                    .style('stroke-width', '2px');
+                  config.mouseover(d, d3.event);
+                  scope.$apply();
+                }).on('mouseleave', function (d) {
+                  d3.select(this)
+                    .select('path')
+                    .transition()
+                    .duration(200)
+                    .style('stroke', '')
+                    .style('stroke-width', '');
+                  removeToolTip();
+                  config.mouseout(d, d3.event);
+                  scope.$apply();
+                }).on('mousemove', function (d) {
+                  updateToolTip(d3.event);
+                }).on('click', function (d) {
+                  config.click(d, d3.event);
+                  scope.$apply();
+                });
+              }
+            });
+
+        if(config.labels) {
+
+          var outerLabelFontSize = radius > 240 ? '1.7em' : '2em';
+          var innerLabelFontSize = radius > 240 ? '2em' : '2.5em';
+          var totalSegmentValues = d3.sum(data.data, function(d){ return d.y[0]; });
+
+          path.append('text').attr('transform', function (d) {
+            var c = arc.centroid(d),
+                m = 2.75;  // label distance from center
+            return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
+          })
+          .attr('dy', '.35em')
+          .style('text-anchor', 'middle').style('font-size', outerLabelFontSize)
+          .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
+          .text(function (d) {
+            return d.data.x;
+          });
+          if (!!config.percentageInnerLabels) {
+            path.append('text').attr('transform', function (d) {
+              var c = arc.centroid(d),
+                  m = 1.5;
+              return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
+            }).attr('dy', '.35em')
+            .style('text-anchor', 'middle').style('font-size', innerLabelFontSize)
+            .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
+            .text(function (d) {
+              return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
+            });
+          }
+        }
+        function tweenPie(b) {
+          b.innerRadius = 0;
+          var i = d3.interpolate({
+              startAngle: 0,
+              endAngle: 0
+            }, b);
+          return function (t) {
+            return arc(i(t));
+          };
+        }
       }
 
       // Draws a line chart
@@ -755,98 +965,7 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
 
-      // Draws a beautiful pie chart
-      // @return {[type]} [description]
 
-      function pieChart() {
-        var radius = Math.min(width, height) / 2;
-        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + 100).attr('height', height + 20).append('g').attr('transform', 'scale(0.8)translate(' + (width / 2 + width * 0.2) + ',' + (height / 2 + height * 0.2) + ')');
-        var innerRadius = 0;
-        if (config.innerRadius) {
-          var configRadius = config.innerRadius;
-          if (typeof configRadius === 'string' && configRadius.indexOf('%') > 0) {
-            configRadius = radius * (parseFloat(configRadius) * 0.01);
-          } else {
-            configRadius = Number(configRadius);
-          }
-          if (configRadius >= 0) {
-            innerRadius = configRadius;
-          }
-        }
-        scope.yMaxData = points.length;
-        var arc = d3.svg.arc().outerRadius(radius - 10).innerRadius(innerRadius);
-        d3.svg.arc().outerRadius(radius + 5).innerRadius(0);
-        var pie = d3.layout.pie().sort(null).value(function (d) {
-            return d.y[0];
-          });
-        var path = svg.selectAll('.arc').data(pie(points)).enter().append('g');
-        var complete = false;
-        path.append('path').style('fill', function (d, i) {
-          return getColor(i);
-        }).transition().ease('linear').duration(config.isAnimate ? 500 : 0).attrTween('d', tweenPie).attr('class', 'arc').each('end', function () {
-          //avoid firing multiple times
-          if (!complete) {
-            complete = true;
-            //Add listeners when transition is done
-            path.on('mouseover', function (d) {
-              makeToolTip({ value: d.data.tooltip ? d.data.tooltip : d.data.y[0] }, d3.event);
-              d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-              config.mouseover(d, d3.event);
-              scope.$apply();
-            }).on('mouseleave', function (d) {
-              d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
-              removeToolTip();
-              config.mouseout(d, d3.event);
-              scope.$apply();
-            }).on('mousemove', function (d) {
-              updateToolTip(d3.event);
-            }).on('click', function (d) {
-              config.click(d, d3.event);
-              scope.$apply();
-            });
-          }
-        });
-        if (!!config.labels) {
-
-          var outerLabelFontSize = radius > 240 ? '1.7em' : '2em';
-          var innerLabelFontSize = radius > 240 ? '2em' : '2.5em';
-          var totalSegmentValues = d3.sum(data.data, function(d){ return d.y[0]; });
-
-          path.append('text').attr('transform', function (d) {
-            var c = arc.centroid(d),
-                m = 2.75;  // label distance from center
-            return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
-          })
-          .attr('dy', '.35em')
-          .style('text-anchor', 'middle').style('font-size', outerLabelFontSize)
-          .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
-          .text(function (d) {
-            return d.data.x;
-          });
-          if (!!config.percentageInnerLabels) {
-            path.append('text').attr('transform', function (d) {
-              var c = arc.centroid(d),
-                  m = 1.5;
-              return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
-            }).attr('dy', '.35em')
-            .style('text-anchor', 'middle').style('font-size', innerLabelFontSize)
-            .style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)')
-            .text(function (d) {
-              return d3.round(100 * d.data.y[0] / totalSegmentValues, 0) + '%';
-            });
-          }
-        }
-        function tweenPie(b) {
-          b.innerRadius = 0;
-          var i = d3.interpolate({
-              startAngle: 0,
-              endAngle: 0
-            }, b);
-          return function (t) {
-            return arc(i(t));
-          };
-        }
-      }
       function pointChart() {
         var margin = {
             top: 0,
@@ -1095,9 +1214,6 @@ angular.module('angularCharts').directive('acChart', [
         acConfig: '='
       }
     };
-
-    $window.alert("hi");
-
 
   }
 ]);
