@@ -692,7 +692,7 @@ angular.module('angularCharts').directive('acChart', [
             complete = true;
             //Add listeners when transition is done
             path.on('mouseover', function (d) {
-              makeToolTip({ value: d.tooltip ? d.tooltip : d.data.y[0] }, d3.event);
+              makeToolTip({ value: d.data.tooltip ? d.data.tooltip : d.data.y[0] }, d3.event);
               d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
               config.mouseover(d, d3.event);
               scope.$apply();
@@ -710,13 +710,14 @@ angular.module('angularCharts').directive('acChart', [
           }
         });
         if (!!config.labels) {
-          var outerLabelFontSize = radius > 240 ? '1.7rem' : '2rem';
-          var innerLabelFontSize = radius > 240 ? '2rem' : '2.5rem';
+          var outerLabelFontSize = radius > 240 ? '1.7em' : '2em';
+          var innerLabelFontSize = radius > 240 ? '2em' : '2.5em';
           var totalSegmentValues = d3.sum(data.data, function (d) {
               return d.y[0];
             });
           path.append('text').attr('transform', function (d) {
-            var c = arc.centroid(d), m = 2.5;
+            var c = arc.centroid(d), m = 2.75;
+            // label distance from center
             return 'translate(' + c[0] * m + ',' + c[1] * m + ')';
           }).attr('dy', '.35em').style('text-anchor', 'middle').style('font-size', outerLabelFontSize).style('text-shadow', '1px 1px 2px rgba(50, 50, 50, 0.8)').text(function (d) {
             return d.data.x;
