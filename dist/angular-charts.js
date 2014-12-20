@@ -240,13 +240,17 @@ angular.module('angularCharts').directive('acChart', [
         }
         svg.append('g').attr('class', 'y axis').call(yAxis);
         // Add bars
+        var barWidth = d3.min([
+            x0.rangeBand(),
+            width / 3
+          ]);
         var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
             return 'translate(' + x(d.x) + ',0)';
           });
         var bars = barGroups.selectAll('rect').data(function (d) {
             return d.nicedata;
           }).enter().append('rect');
-        bars.attr('width', x0.rangeBand());
+        bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
           return x0(i);
         }).attr('y', height).style('fill', function (d) {
@@ -392,13 +396,17 @@ angular.module('angularCharts').directive('acChart', [
           svg.append('text').attr('transform', 'rotate(-90)').attr('y', 0 - margin.left).attr('x', 0 - height / 2).attr('dy', '1em').style('text-anchor', 'middle').attr('class', 'y-axis-label').text(config.yAxis.label);
         }
         // Add bars
+        var barWidth = d3.min([
+            x.rangeBand(),
+            width / 3
+          ]);
         var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
             return 'translate(' + x(d.x) + ',0)';
           });
         var bars = barGroups.selectAll('rect').data(function (d) {
             return d.nicedata;
           }).enter().append('rect');
-        bars.attr('width', x.rangeBand());
+        bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
           return x(i);
         }).attr('y', height).style('fill', function (d) {
