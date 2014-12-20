@@ -293,6 +293,7 @@ angular.module('angularCharts').directive('acChart', [
            .call(yAxis);
 
         // Add bars
+        var barWidth = d3.min([x0.rangeBand(), (width / 3)]);
         var barGroups = svg.selectAll('.state')
                            .data(points)
                            .enter()
@@ -306,7 +307,7 @@ angular.module('angularCharts').directive('acChart', [
                               return d.nicedata;
                             }).enter()
                             .append('rect');
-        bars.attr('width', x0.rangeBand());
+        bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
               return x0(i);
             })
@@ -524,6 +525,7 @@ angular.module('angularCharts').directive('acChart', [
         }
 
         // Add bars
+        var barWidth = d3.min([x.rangeBand(), (width / 3)]);
         var barGroups = svg.selectAll('.state')
           .data(points)
           .enter()
@@ -539,7 +541,7 @@ angular.module('angularCharts').directive('acChart', [
           })
           .enter()
           .append('rect');
-        bars.attr('width', x.rangeBand());
+        bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
             return x(i);
           })
