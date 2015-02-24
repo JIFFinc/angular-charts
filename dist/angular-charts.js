@@ -177,7 +177,7 @@ angular.module('angularCharts').directive('acChart', [
             top: 0,
             right: 20,
             bottom: 30,
-            left: 40
+            left: config.axisLabel && config.axisLabel.y ? 60 : 40
           };
         width -= margin.left + margin.right;
         height -= margin.top + margin.bottom;
@@ -239,11 +239,15 @@ angular.module('angularCharts').directive('acChart', [
           svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('dy', '1.2em');
         }
         svg.append('g').attr('class', 'y axis').call(yAxis);
+        if (config.axisLabel && config.axisLabel.y) {
+          svg.append('text').attr('class', 'y axis-label').attr('text-anchor', 'middle').attr('transform', 'rotate(-90)').attr('y', 25).attr('x', -1 * height / 2).attr('dy', '-5em').style('font-size', '2em').text(config.axisLabel.y);
+        }
         // Add bars
         var barWidth = d3.min([
             x0.rangeBand(),
             width / 3
           ]);
+        var minBarHeight = config.minBarHeight ? config.minBarHeight : 0;
         var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
             return 'translate(' + x(d.x) + ',0)';
           });
@@ -256,9 +260,13 @@ angular.module('angularCharts').directive('acChart', [
         }).attr('y', height).style('fill', function (d) {
           return getColor(d.s);
         }).attr('height', 0).transition().ease('cubic-in-out').duration(config.isAnimate ? 1000 : 0).attr('y', function (d) {
-          return y(Math.max(0, d.y));
+          var ret = y(Math.max(0, d.y));
+          if (y(0) - y(d.y) < minBarHeight) {
+            ret = ret - minBarHeight;
+          }
+          return ret;
         }).attr('height', function (d) {
-          return Math.abs(y(d.y) - y(0));
+          return Math.max(Math.abs(y(d.y) - y(0)), minBarHeight);
         });
         // Add events for tooltip
         bars.on('mouseover', function (d) {
