@@ -335,7 +335,7 @@ angular.module('angularCharts').directive('acChart', [
             .attr('y', function (d) {
               var ret = y(Math.max(0, d.y));
               if (y(0) - y(d.y) < minBarHeight) {
-                ret = ret - minBarHeight;
+                ret = ret - minBarHeight + (y(0) - y(d.y));
               }
               return ret;
             })
