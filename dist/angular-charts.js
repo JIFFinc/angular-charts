@@ -255,8 +255,9 @@ angular.module('angularCharts').directive('acChart', [
         var bars = barGroups.selectAll('rect').data(function (d) {
             return d.nicedata;
           }).enter().append('rect').attr('class', function (d) {
-            if (d.columnId)
+            if (config.highlight && d.columnId) {
               return 'highlightable-bar ' + d.columnId;
+            }
           });
         bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
