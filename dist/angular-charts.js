@@ -201,7 +201,8 @@ angular.module('angularCharts').directive('acChart', [
               x: d.x,
               y: e,
               s: i,
-              tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip
+              tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip,
+              columnId: d.columnId
             };
           });
         });
@@ -253,7 +254,10 @@ angular.module('angularCharts').directive('acChart', [
           });
         var bars = barGroups.selectAll('rect').data(function (d) {
             return d.nicedata;
-          }).enter().append('rect');
+          }).enter().append('rect').attr('class', function (d) {
+            if (d.columnId)
+              return 'highlightable-bar ' + d.columnId;
+          });
         bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
           return x0(i);
@@ -275,10 +279,16 @@ angular.module('angularCharts').directive('acChart', [
             value: d.tooltip ? d.tooltip : d.y,
             series: series[d.s]
           }, d3.event);
+          if (config.highlight) {
+            highlightColumn(d.columnId);
+          }
           config.mouseover(d, d3.event);
           scope.$apply();
         }).on('mouseleave', function (d) {
           removeToolTip();
+          if (config.highlight) {
+            unhighlightColumn(d.columnId);
+          }
           config.mouseout(d, d3.event);
           scope.$apply();
         }).on('mousemove', function (d) {
@@ -890,6 +900,20 @@ angular.module('angularCharts').directive('acChart', [
             top: event.pageY - 30 + 'px'
           });
         }
+      }
+      function highlightColumn(columnId) {
+        var bar = angular.element('.' + columnId);
+        if (bar[0]) {
+          bar[0].classList.add('highlighted');
+        }
+        angular.element(document).find('.' + columnId).addClass('highlighted');
+      }
+      function unhighlightColumn(columnId) {
+        var bar = angular.element('.' + columnId);
+        if (bar[0]) {
+          bar[0].classList.remove('highlighted');
+        }
+        angular.element(document).find('.' + columnId).removeClass('highlighted');
       }
       // Adds data to legend
       function drawLegend() {
