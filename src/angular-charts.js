@@ -322,7 +322,9 @@ angular.module('angularCharts').directive('acChart', [
                             }).enter()
                             .append('rect')
                             .attr('class', function (d) {
-                              if(d.columnId) return 'highlightable-bar '+d.columnId;
+                              if(config.highlight && d.columnId) {
+                                return 'highlightable-bar '+d.columnId;
+                              }
                             });
         bars.attr('width', barWidth);
         bars.attr('x', function (d, i) {
